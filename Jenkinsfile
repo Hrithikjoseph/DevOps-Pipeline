@@ -76,9 +76,9 @@ pipeline {
         failure {
             echo 'Pipeline failed. Check the logs for details.'
             // Send email notification in case of failure
-            mail to: 'hrithikjsoeph72@gmail.com',
+            /*mail to: 'hrithikjsoeph72@gmail.com',
                  subject: "Build ${env.JOB_NAME} failed at stage ${env.STAGE_NAME}",
-                 body: "The build failed. Please review the Jenkins logs."
+                 body: "The build failed. Please review the Jenkins logs."*/
         }
     }
 }
