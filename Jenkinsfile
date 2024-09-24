@@ -1,13 +1,12 @@
 pipeline {
     agent any
-
     stages {
-        stage('Checkout') {
+        /*stage('Checkout') {
             steps {
                 // Clone the repository
                 git url: 'https://github.com/Hrithikjoseph/DevOps-Pipeline', credentialsId: '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'
             }
-        }
+        }*/
 
         // Stage 1: Build (Packaging static files)
         stage('Build') {
