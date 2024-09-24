@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        SSH_KEY = credentials('ec2-user')
+        SSH_KEY = credentials('C:/Users/hrith/Downloads/mykey.pem')
         EC2_HOST = '3.24.214.141'
         EC2_USER = 'ec2-user'
     }
