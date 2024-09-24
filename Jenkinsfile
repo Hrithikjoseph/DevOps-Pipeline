@@ -41,8 +41,8 @@ pipeline {
                 // Example: Deploy to an Apache/Nginx web server or AWS S3 bucket
                 // Adjust the deployment script based on your environment
                 sh '''
-                scp webapp.zip BEAST@10.141.63.100:/var/www/html/
-                ssh BEAST@10.141.63.100 "cd /var/www/html && unzip -o webapp.zip"
+                scp webapp.zip ec2-user@3.24.214.141:/var/www/html/
+                ssh ec2-user@3.24.214.141 "cd /var/www/html && unzip -o webapp.zip"
                 '''
 
                 // OR Deploy to AWS S3 if applicable
