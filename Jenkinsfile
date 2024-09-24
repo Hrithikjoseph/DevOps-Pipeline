@@ -41,7 +41,7 @@ pipeline {
                 // Example: Deploy to an Apache/Nginx web server or AWS S3 bucket
                 // Adjust the deployment script based on your environment
                 sh '''
-                   scp -i $SSH_KEY webapp.zip ec2-user@3.24.214.141:/var/www/html/
+                   scp -i C:/Users/hrith/Downloads/mykey.pem webapp.zip ec2-user@3.24.214.141:/var/www/html/
                    ssh -i $SSH_KEY ec2-user@3.24.214.141 "cd /var/www/html && unzip -o webapp.zip"
                 '''
 
