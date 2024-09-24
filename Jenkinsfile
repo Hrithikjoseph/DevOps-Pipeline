@@ -5,7 +5,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Clone the repository
-                git url: 'https://github.com/Hrithikjoseph/DevOps-Pipeline.git', credentialsId: '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'
+                git url: 'https://github.com/Hrithikjoseph/DevOps-Pipeline', credentialsId: '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'
             }
         }
 
