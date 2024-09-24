@@ -39,22 +39,21 @@ pipeline {
 
         // Stage 3: Deploy (Deploy static files)
         stage('Deploy') {
-            steps {
-                echo 'Deploying static files...'
-
-                // Example: Deploy to an Apache/Nginx web server or AWS S3 bucket
-                // Adjust the deployment script based on your environment
-                withCredentials([sshUserPrivateKey(credentialsId: '58600e5c-4373-47ad-8176-9693b0d881fa', keyFileVariable: 'SSH_KEY')]) {
-                sh '''
-                   scp -i ${SSH_KEY} webapp.zip ${EC2_USER}@${EC2_HOST}:/var/www/html/
-                   ssh -i ${SSH_KEY} ${EC2_USER}@${EC2_HOST} "cd /var/www/html && unzip -o webapp.zip"
-                '''
-
-                // OR Deploy to AWS S3 if applicable
-                // sh 'aws s3 cp webapp.zip s3://your-s3-bucket-name/webapp.zip'
-                }
-            }
+    steps {
+        echo 'Deploying static files...'
+        withCredentials([sshUserPrivateKey(credentialsId: '58600e5c-4373-47ad-8176-9693b0d881fa', keyFileVariable: 'SSH_KEY')]) {
+            sh """
+               scp -i \${SSH_KEY} webapp.zip ${EC2_USER}@${EC2_HOST}:/home/${EC2_USER}/
+               ssh -i \${SSH_KEY} ${EC2_USER}@${EC2_HOST} "
+                   cd /home/${EC2_USER} && 
+                   unzip -o webapp.zip &&
+                   sudo mv webapp/* /var/www/html/ &&
+                   sudo chown -R www-data:www-data /var/www/html
+               "
+            """
         }
+    }
+}
 
         // Optional: Monitoring and alerting stage (Uptime monitoring)
         stage('Monitoring and Alerting') {
