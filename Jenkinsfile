@@ -9,39 +9,77 @@ pipeline {
             }
         }
 
+        // Stage 1: Build (Packaging static files)
         stage('Build') {
             steps {
-                // For HTML/CSS projects, no actual "build" is required
-                echo 'Building the website (static HTML/CSS)'
+                echo 'Packaging static files...'
+
+                // Create a ZIP archive of the web app (HTML, CSS, SVG)
+                sh 'zip -r webapp.zip index.html main.css logo.svg'
+                
+                // Archive the package as a build artifact
+                archiveArtifacts artifacts: 'webapp.zip', allowEmptyArchive: false
             }
         }
 
-        stage('Test') {
+        // Stage 2: Code Quality Analysis (HTML/CSS linting)
+        stage('Code Quality Analysis') {
             steps {
-                // Example step for testing HTML/CSS syntax (optional)
-                echo 'Testing website for any HTML/CSS errors'
+                echo 'Running code quality checks...'
+
+                // Check for HTML/CSS issues using linters
+                // Assuming `htmlhint` and `csslint` are available in the environment
+                sh 'htmlhint index.html'
+                sh 'csslint main.css'
             }
         }
 
+        // Stage 3: Deploy (Deploy static files)
         stage('Deploy') {
             steps {
-                // Deploy to the target server (can be set up via rsync, FTP, etc.)
-                echo 'Deploying the website'
+                echo 'Deploying static files...'
+
+                // Example: Deploy to an Apache/Nginx web server or AWS S3 bucket
+                // Adjust the deployment script based on your environment
+                sh '''
+                scp webapp.zip user@yourserver:/var/www/html/
+                ssh user@yourserver "cd /var/www/html && unzip -o webapp.zip"
+                '''
+
+                // OR Deploy to AWS S3 if applicable
+                // sh 'aws s3 cp webapp.zip s3://your-s3-bucket-name/webapp.zip'
+            }
+        }
+
+        // Optional: Monitoring and alerting stage (Uptime monitoring)
+        stage('Monitoring and Alerting') {
+            steps {
+                echo 'Setting up basic monitoring...'
+
+                // Example: Use cURL to check if the website is up
+                sh 'curl -Is http://yourwebsite.com | head -n 1'
+
+                // OR Integrate with external monitoring services like UptimeRobot or Datadog
+                // sh 'curl -X POST "https://api.datadoghq.com/api/v1/check_run" -H "DD-API-KEY: <your_api_key>" -d \'{"check": "webapp.status", "status": 0, "message": "Website is up"}\''
             }
         }
     }
 
-   post {
-    success {
-        mail to: 'team@example.com',
-            subject: "SUCCESS: Build ${env.JOB_NAME} ${env.BUILD_NUMBER}",
-            body: "The build was successful."
-    }
-    failure {
-        mail to: 'team@example.com',
-            subject: "FAILURE: Build ${env.JOB_NAME} ${env.BUILD_NUMBER}",
-            body: "The build failed. Please check the Jenkins logs."
-    }
-}
-}
+    post {
+        success {
+            echo 'Pipeline completed successfully.'
+            // Send email notification 
+            mail to: 'hrithikjsoeph72@gmail.com',
+                 subject: "Build ${env.JOB_NAME} success",
+                 body: "The build successful."
+        }
 
+        failure {
+            echo 'Pipeline failed. Check the logs for details.'
+            // Send email notification in case of failure
+            mail to: 'hrithikjsoeph72@gmail.com',
+                 subject: "Build ${env.JOB_NAME} failed at stage ${env.STAGE_NAME}",
+                 body: "The build failed. Please review the Jenkins logs."
+        }
+    }
+}
