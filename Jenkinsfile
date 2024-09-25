@@ -29,61 +29,76 @@ pipeline {
             }
         }
 
-        // Stage 3: Code Quality Analysis
         stage('Code Quality Analysis') {
             steps {
                 echo 'Running Code Quality Analysis...'
                 
-                // Tool: Stylelint (for CSS file linting)
-               // sh 'npx stylelint main.css'
-                sh 'npm install codeclimate-test-reporter --save-dev'
-                // Optional: Run Code Climate analysis (assuming you have installed it)
-                sh 'npx codeclimate analyze'
-            }
-        }
-
-        // Stage 4: Deploy
-        stage('Deploy') {
-            steps {
-                echo 'Deploying the application...'
+                // Run Stylelint
+                sh 'npx stylelint "**/*.css"'
                 
-                // Tool: SCP (for secure file transfer)
+                // Run CodeClimate analysis
                 sh '''
-                    scp -i /path/to/your/key.pem webapp.zip ec2-user@3.24.214.141:/var/www/html/
+                    curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+                    chmod +x ./cc-test-reporter
+                    ./cc-test-reporter before-build
+                    # Run your tests here if they generate coverage data
+                    ./cc-test-reporter after-build --exit-code $?
                 '''
             }
         }
-
-        // Stage 5: Release
-        stage('Release') {
+        
+        stage('Deploy to Test') {
             steps {
-                echo 'Releasing the application...'
+                echo 'Deploying to test environment...'
                 
-                // Tool: AWS CLI (if using AWS for deployment)
+                // Example using Docker
+                sh '''
+                    docker build -t myapp-test .
+                    docker stop myapp-test || true
+                    docker rm myapp-test || true
+                    docker run -d --name myapp-test -p 8080:80 myapp-test
+                '''
+            }
+        }
+        
+        stage('Release to Production') {
+            steps {
+                echo 'Releasing to production environment...'
+                
+                // Example using AWS CodeDeploy
                 sh '''
                     aws deploy create-deployment \
-                    --application-name MyApp \
-                    --deployment-group-name MyDeploymentGroup \
-                    --s3-location bucket=mybucket,key=myapp.zip,bundleType=zip
+                        --application-name MyApp \
+                        --deployment-group-name MyProductionGroup \
+                        --s3-location bucket=my-artifacts-bucket,key=webapp.zip,bundleType=zip
                 '''
             }
         }
-
-        // Stage 6: Monitoring and Alerting
+        
         stage('Monitoring and Alerting') {
             steps {
-                echo 'Monitoring and Alerting...'
+                echo 'Setting up monitoring and alerting...'
                 
-                // Tool: Datadog (for monitoring)
+                // Example using Datadog
                 sh '''
-                    curl -X POST "https://api.datadoghq.com/api/v1/check_run" \
+                    curl -X POST "https://api.datadoghq.com/api/v1/series" \
                     -H "Content-Type: application/json" \
-                    -H "DD-API-KEY: <your_datadog_api_key>" \
-                    -d '{"check": "app.status", "status": 0, "message": "App is running fine"}'
+                    -H "DD-API-KEY: ${DATADOG_API_KEY}" \
+                    -d @- << EOF
+                    {
+                        "series": [
+                            {
+                                "metric": "myapp.deployment",
+                                "points": [[$(date +%s), 1]],
+                                "type": "gauge",
+                                "tags": ["environment:production"]
+                            }
+                        ]
+                    }
+                    EOF
                 '''
             }
         }
-    }
     
     post {
         success {
