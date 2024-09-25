@@ -1,36 +1,45 @@
 pipeline {
-    agent any
-
-    tools {
-        // Adjust these names to match your Jenkins tool configurations
-        maven 'Maven'  // Use the name configured in Jenkins for Maven
-        jdk 'JDK'      // Use the name configured in Jenkins for JDK
-    }
+    agent any // Use any available agent (node)
 
     stages {
+        // Stage 1: Build
         stage('Build') {
             steps {
                 echo 'Building the application...'
+                
+                // For Java project example, create a JAR file
+                // Adjust this depending on your project type (web app, mobile app, etc.)
                 sh 'mvn clean package'
-                archiveArtifacts artifacts: '**/target/*.jar', allowEmptyArchive: true
+                
+                // Store the build artifact
+                archiveArtifacts artifacts: '*/target/*.jar', allowEmptyArchive: true
             }
         }
 
+        // Stage 2: Test
         stage('Test') {
             steps {
                 echo 'Running tests...'
+                
+                // Example: Run unit tests using JUnit
+                // Adjust this depending on your testing framework (JUnit, Selenium, etc.)
                 sh 'mvn test'
-                junit '**/target/surefire-reports/*.xml'
+                
+                // Publish test results
+                junit '*/target/surefire-reports/*.xml'
             }
         }
 
+        // Stage 3: Code Quality Analysis
         stage('Code Quality Analysis') {
             steps {
                 echo 'Running Code Quality Analysis...'
+                
+                // Ensure the test coverage report is generated first (e.g., Jacoco for Java)
                 sh 'mvn jacoco:report'
-                // Assuming CodeClimate CLI is installed on the Jenkins agent
+                
+                // Upload the coverage to CodeClimate
                 sh '''
-                    export CC_TEST_REPORTER_ID=your_codeclimate_reporter_id
                     cc-test-reporter before-build
                     cc-test-reporter format-coverage --input-type jacoco target/site/jacoco/jacoco.xml
                     cc-test-reporter upload-coverage
@@ -38,18 +47,20 @@ pipeline {
             }
         }
 
+        // Stage 4: Deploy
         stage('Deploy') {
             steps {
                 echo 'Deploying the application...'
-                // Example: Deploy using a script or a Jenkins plugin
-                sh './deploy.sh' // A custom deploy script
+                
+                // Example: Deploy to a specific environment, adjust this to your specific deployment method
+                sh 'mvn spring-boot:run' // Replace with your actual deployment command
             }
         }
 
+        // Stage 5: Release
         stage('Release') {
             steps {
                 echo 'Releasing the application...'
-                // Assuming AWS CLI is installed on the Jenkins agent
                 sh '''
                     aws deploy create-deployment \
                     --application-name MyApp \
@@ -59,24 +70,33 @@ pipeline {
             }
         }
 
+        // Stage 6: Monitoring and Alerting
         stage('Monitoring and Alerting') {
             steps {
                 echo 'Monitoring and Alerting...'
-                // Using a Jenkins plugin for Datadog integration
-                datadog(tags: ['env:production', 'app:MyApp'])
+                
+                // Example: Integrate with Datadog or New Relic
+                // Adjust this to your monitoring tool
+                sh '''
+                    curl -X POST "https://api.datadoghq.com/api/v1/check_run" \
+                    -H "Content-Type: application/json" \
+                    -H "DD-API-KEY: <your_datadog_api_key>" \
+                    -d '{"check": "app.status", "status": 0, "message": "App is running fine"}'
+                '''
             }
         }
     }
-
+    
     post {
         success {
             echo 'Pipeline completed successfully.'
         }
         failure {
             echo 'Pipeline failed.'
+            // Example: Send email notification on failure
             mail to: 'team@example.com',
-                 subject: "FAILURE: Build ${env.JOB_NAME} ${env.BUILD_NUMBER}",
-                 body: "The build failed. Please check the Jenkins logs."
+                subject: "FAILURE: Build ${env.JOB_NAME} ${env.BUILD_NUMBER}",
+                body: "The build failed. Please check the Jenkins logs."
         }
     }
 }
