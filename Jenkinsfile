@@ -112,4 +112,5 @@ pipeline {
                 body: "The build failed. Please check the Jenkins logs."
         }
     }
+  }
 }
