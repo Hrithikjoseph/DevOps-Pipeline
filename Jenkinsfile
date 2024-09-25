@@ -13,7 +13,7 @@ pipeline {
                 // Archive the package as a build artifact
                 archiveArtifacts artifacts: 'webapp.zip', allowEmptyArchive: false
 
-                sh 'sudo su npm install stylelint stylelint-config-standard --save-dev'
+                sh 'npm install stylelint stylelint-config-standard --save-dev'
             }
         }
 
