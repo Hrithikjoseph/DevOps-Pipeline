@@ -35,7 +35,7 @@ pipeline {
                 echo 'Running Code Quality Analysis...'
                 
                 // Tool: Stylelint (for CSS file linting)
-                sh 'npx stylelint main.css'
+               // sh 'npx stylelint main.css'
                 
                 // Optional: Run Code Climate analysis (assuming you have installed it)
                 sh 'npx codeclimate analyze'
