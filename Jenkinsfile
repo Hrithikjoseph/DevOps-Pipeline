@@ -1,89 +1,71 @@
 pipeline {
     agent any
-    environment {
-        EC2_HOST = '3.24.214.141'
-        EC2_USER = 'ec2-user'
-    }
-    stages {
-        /*stage('Checkout') {
-            steps {
-                // Clone the repository
-                git url: 'https://github.com/Hrithikjoseph/DevOps-Pipeline', credentialsId: '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'
-            }
-        }*/
 
-        // Stage 1: Build (Packaging static files)
+    stages {
         stage('Build') {
             steps {
-                echo 'Packaging static files...'
-
-                // Create a ZIP archive of the web app (HTML, CSS, SVG)
-                sh 'zip -r webapp.zip index.html main.css logo.svg'
-                
-                // Archive the package as a build artifact
-                archiveArtifacts artifacts: 'webapp.zip', allowEmptyArchive: false
+                echo 'Building the application...'
+                sh 'docker build -t my-web-app .'
             }
         }
 
-        // Stage 2: Code Quality Analysis (HTML/CSS linting)
+        stage('Test') {
+            steps {
+                echo 'Running tests...'
+                sh './gradlew test'
+            }
+            post {
+                always {
+                    junit '**/build/test-results/test/*.xml'  // Collect JUnit test results
+                }
+            }
+        }
+
         stage('Code Quality Analysis') {
             steps {
-                echo 'Running code quality checks...'
-
-                // Check for HTML/CSS issues using linters
-                // Assuming `htmlhint` and `csslint` are available in the environment
-                sh 'htmlhint index.html'
-                sh 'csslint main.css'
+                echo 'Running CodeClimate analysis...'
+                sh '''
+                cc-test-reporter before-build
+                ./gradlew test
+                cc-test-reporter after-build --exit-code $?
+                '''
             }
         }
 
-        // Stage 3: Deploy (Deploy static files)
         stage('Deploy') {
-    steps {
-        echo 'Deploying static files...'
-        withCredentials([sshUserPrivateKey(credentialsId: '58600e5c-4373-47ad-8176-9693b0d881fa', keyFileVariable: 'SSH_KEY')]) {
-            sh """
-               scp -i \${SSH_KEY} webapp.zip ${EC2_USER}@${EC2_HOST}:/home/${EC2_USER}/
-               ssh -i \${SSH_KEY} ${EC2_USER}@${EC2_HOST} "
-                   cd /home/${EC2_USER} && 
-                   unzip -o webapp.zip &&
-                   sudo mv webapp/* /var/www/html/ &&
-                   sudo chown -R www-data:www-data /var/www/html
-               "
-            """
+            steps {
+                echo 'Deploying the application...'
+                sh 'docker-compose up -d'
+            }
         }
-    }
-}
 
-        // Optional: Monitoring and alerting stage (Uptime monitoring)
+        stage('Release') {
+            steps {
+                echo 'Promoting to production environment...'
+                sh '''
+                aws deploy create-deployment \
+                    --application-name MyWebApp \
+                    --deployment-group-name MyDeploymentGroup \
+                    --github-location repository=MyGitHubRepo,commitId=HEAD
+                '''
+            }
+        }
+
         stage('Monitoring and Alerting') {
             steps {
-                echo 'Setting up basic monitoring...'
-
-                // Example: Use cURL to check if the website is up
-                sh 'curl -Is http://yourwebsite.com | head -n 1'
-
-                // OR Integrate with external monitoring services like UptimeRobot or Datadog
-                // sh 'curl -X POST "https://api.datadoghq.com/api/v1/check_run" -H "DD-API-KEY: <your_api_key>" -d \'{"check": "webapp.status", "status": 0, "message": "Website is up"}\''
+                echo 'Setting up monitoring and alerting...'
+                // Use Datadog for monitoring the application
+                sh 'datadog-agent status'  // Assuming Datadog agent is installed and configured
             }
         }
     }
 
     post {
         success {
-            echo 'Pipeline completed successfully.'
-            // Send email notification 
-            mail to: 'hrithikjsoeph72@gmail.com',
-                 subject: "Build ${env.JOB_NAME} success",
-                 body: "The build successful."
+            echo 'Pipeline completed successfully!'
         }
-
         failure {
-            echo 'Pipeline failed. Check the logs for details.'
-            // Send email notification in case of failure
-            /*mail to: 'hrithikjsoeph72@gmail.com',
-                 subject: "Build ${env.JOB_NAME} failed at stage ${env.STAGE_NAME}",
-                 body: "The build failed. Please review the Jenkins logs."*/
+            echo 'Pipeline failed, sending alerts...'
         }
     }
 }
