@@ -36,7 +36,7 @@ pipeline {
                 
                 // Tool: Stylelint (for CSS file linting)
                // sh 'npx stylelint main.css'
-                
+                sh 'npm install codeclimate-test-reporter --save-dev'
                 // Optional: Run Code Climate analysis (assuming you have installed it)
                 sh 'npx codeclimate analyze'
             }
