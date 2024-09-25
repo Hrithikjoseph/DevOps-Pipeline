@@ -12,6 +12,8 @@ pipeline {
                 
                 // Archive the package as a build artifact
                 archiveArtifacts artifacts: 'webapp.zip', allowEmptyArchive: false
+
+                sh 'sudo su npm install stylelint stylelint-config-standard --save-dev'
             }
         }
 
@@ -33,7 +35,7 @@ pipeline {
                 
                 // Tool: Stylelint (for CSS file linting)
                // sh 'npm install -g stylelint'
-                sh 'stylelint main.css'
+                sh 'npx stylelint main.css'
             }
         }
 
