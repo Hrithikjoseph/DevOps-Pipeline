@@ -13,6 +13,7 @@ pipeline {
                 // Archive the package as a build artifact
                 archiveArtifacts artifacts: 'webapp.zip', allowEmptyArchive: false
 
+                // Install Stylelint and related packages
                 sh 'npm install stylelint stylelint-config-standard --save-dev'
             }
         }
@@ -34,8 +35,10 @@ pipeline {
                 echo 'Running Code Quality Analysis...'
                 
                 // Tool: Stylelint (for CSS file linting)
-               // sh 'npm install -g stylelint'
                 sh 'npx stylelint main.css'
+                
+                // Optional: Run Code Climate analysis (assuming you have installed it)
+                sh 'npx codeclimate analyze'
             }
         }
 
