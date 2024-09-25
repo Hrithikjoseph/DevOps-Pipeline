@@ -52,7 +52,7 @@ pipeline {
                 
                 // Example using Docker
                 sh '''
-                    docker -H tcp://localhost:2375 build -t myapp-test .
+                    docker build -t myapp-test .
                     docker stop myapp-test || true
                     docker rm myapp-test || true
                     docker run -d --name myapp-test -p 8080:80 myapp-test
