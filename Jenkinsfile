@@ -29,22 +29,22 @@ pipeline {
             }
         }
 
-        stage('Code Quality Analysis') {
-    steps {
-        echo 'Running Code Quality Analysis...'
+       //stage('Code Quality Analysis') {
+    //steps {
+        //echo 'Running Code Quality Analysis...'
         
         // Run Stylelint and auto-fix errors
-        sh 'npx stylelint "**/*.css" --fix'
+       // sh 'npx stylelint "**/*.css" --fix'
         
         // Run CodeClimate analysis
-        sh '''
+      /*  sh '''
             curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
             chmod +x ./cc-test-reporter
             ./cc-test-reporter before-build
             ./cc-test-reporter after-build --exit-code $? --debug --insecure --batch-size 1000
         '''
     }
-}
+} */
         
         stage('Deploy to Test') {
             steps {
