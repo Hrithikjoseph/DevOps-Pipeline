@@ -30,22 +30,22 @@ pipeline {
         }
 
         stage('Code Quality Analysis') {
-            steps {
-                echo 'Running Code Quality Analysis...'
-                
-                // Run Stylelint
-                sh 'npx stylelint "**/*.css"'
-                
-                // Run CodeClimate analysis
-                sh '''
-                    curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-                    chmod +x ./cc-test-reporter
-                    ./cc-test-reporter before-build
-                    # Run your tests here if they generate coverage data
-                    ./cc-test-reporter after-build --exit-code $?
-                '''
-            }
-        }
+    steps {
+        echo 'Running Code Quality Analysis...'
+        
+        // Run Stylelint and auto-fix errors
+        sh 'npx stylelint "**/*.css" --fix'
+        
+        // Run CodeClimate analysis
+        sh '''
+            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+            chmod +x ./cc-test-reporter
+            ./cc-test-reporter before-build
+            # Run your tests here if they generate coverage data
+            ./cc-test-reporter after-build --exit-code $?
+        '''
+    }
+}
         
         stage('Deploy to Test') {
             steps {
