@@ -32,7 +32,7 @@ pipeline {
                 echo 'Running Code Quality Analysis...'
                 
                 // Tool: Stylelint (for CSS file linting)
-                sh 'npm install -g stylelint'
+               // sh 'npm install -g stylelint'
                 sh 'stylelint main.css'
             }
         }
