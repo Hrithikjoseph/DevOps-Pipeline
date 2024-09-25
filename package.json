@@ -1,14 +1,15 @@
 {
-  "name": "my-project",
+  "name": "static-website",
   "version": "1.0.0",
-  "description": "A brief description of your project",
-  "main": "index.js",
+  "description": "A simple static website",
+  "main": "index.html",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"No tests specified\" && exit 0",
+    "lint:css": "stylelint \"**/*.css\"",
+    "lint": "npm run lint:css"
   },
-  "keywords": [],
-  "author": "Your Name",
-  "license": "ISC",
-  "dependencies": {},
-  "devDependencies": {}
+  "devDependencies": {
+    "stylelint": "^15.10.1",
+    "stylelint-config-standard": "^34.0.0"
+  }
 }
