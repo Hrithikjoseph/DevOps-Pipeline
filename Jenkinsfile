@@ -6,8 +6,8 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Packaging static files...'
-
-                // Create a ZIP archive of the web app (HTML, CSS, SVG)
+                
+                // Tool: Zip (for packaging files)
                 sh 'zip -r webapp.zip index.html main.css logo.svg'
                 
                 // Archive the package as a build artifact
@@ -20,12 +20,10 @@ pipeline {
             steps {
                 echo 'Running tests...'
                 
-                // Example: Run unit tests using JUnit
-                // Adjust this depending on your testing framework (JUnit, Selenium, etc.)
-                sh 'mvn test'
-                
-                // Publish test results
-                junit '*/target/surefire-reports/*.xml'
+                // Tool: HTMLHint (for static HTML file linting)
+                // Ensure HTMLHint is installed on the Jenkins agent
+                sh 'npm install -g htmlhint'
+                sh 'htmlhint index.html'
             }
         }
 
@@ -34,15 +32,10 @@ pipeline {
             steps {
                 echo 'Running Code Quality Analysis...'
                 
-                // Ensure the test coverage report is generated first (e.g., Jacoco for Java)
-                sh 'mvn jacoco:report'
-                
-                // Upload the coverage to CodeClimate
-                sh '''
-                    cc-test-reporter before-build
-                    cc-test-reporter format-coverage --input-type jacoco target/site/jacoco/jacoco.xml
-                    cc-test-reporter upload-coverage
-                '''
+                // Tool: Stylelint (for CSS file linting)
+                // Ensure Stylelint is installed on the Jenkins agent
+                sh 'npm install -g stylelint'
+                sh 'stylelint main.css'
             }
         }
 
@@ -51,8 +44,11 @@ pipeline {
             steps {
                 echo 'Deploying the application...'
                 
-                // Example: Deploy to a specific environment, adjust this to your specific deployment method
-                sh 'mvn spring-boot:run' // Replace with your actual deployment command
+                // Tool: SCP (for secure file transfer)
+                // Ensure you replace the path to your key file
+                sh '''
+                    scp -i /path/to/your/key.pem webapp.zip ec2-user@3.24.214.141:/var/www/html/
+                '''
             }
         }
 
@@ -60,6 +56,8 @@ pipeline {
         stage('Release') {
             steps {
                 echo 'Releasing the application...'
+                
+                // Tool: AWS CLI (if using AWS for deployment)
                 sh '''
                     aws deploy create-deployment \
                     --application-name MyApp \
@@ -74,8 +72,8 @@ pipeline {
             steps {
                 echo 'Monitoring and Alerting...'
                 
-                // Example: Integrate with Datadog or New Relic
-                // Adjust this to your monitoring tool
+                // Tool: Datadog (for monitoring)
+                // Example integration with Datadog (ensure Datadog agent is set up)
                 sh '''
                     curl -X POST "https://api.datadoghq.com/api/v1/check_run" \
                     -H "Content-Type: application/json" \
