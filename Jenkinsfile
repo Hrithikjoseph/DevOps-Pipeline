@@ -1,9 +1,10 @@
 pipeline {
-    agent any // Use any available agent instead of Docker
+    agent any
 
     tools {
-        maven 'Maven 3.8.4' // Use Maven installation defined in Jenkins
-        jdk 'JDK 11' // Use JDK installation defined in Jenkins
+        // Adjust these names to match your Jenkins tool configurations
+        maven 'Maven'  // Use the name configured in Jenkins for Maven
+        jdk 'JDK'      // Use the name configured in Jenkins for JDK
     }
 
     stages {
@@ -61,11 +62,8 @@ pipeline {
         stage('Monitoring and Alerting') {
             steps {
                 echo 'Monitoring and Alerting...'
-                // Using a Jenkins plugin for Datadog integration instead of curl
-                datadog(
-                    tags: ['env:production', 'app:MyApp'],
-                    text: 'App is running fine'
-                )
+                // Using a Jenkins plugin for Datadog integration
+                datadog(tags: ['env:production', 'app:MyApp'])
             }
         }
     }
