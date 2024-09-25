@@ -20,10 +20,9 @@ pipeline {
             steps {
                 echo 'Running tests...'
                 
-                // Tool: HTMLHint (for static HTML file linting)
-                // Ensure HTMLHint is installed on the Jenkins agent
-                sh 'npm install -g htmlhint'
-                sh 'htmlhint index.html'
+                // Tool: JUnit (for testing)
+                // This assumes you have a JUnit test suite ready in your project
+                sh 'mvn test' // Replace with the command to run your JUnit tests
             }
         }
 
@@ -33,7 +32,6 @@ pipeline {
                 echo 'Running Code Quality Analysis...'
                 
                 // Tool: Stylelint (for CSS file linting)
-                // Ensure Stylelint is installed on the Jenkins agent
                 sh 'npm install -g stylelint'
                 sh 'stylelint main.css'
             }
@@ -45,7 +43,6 @@ pipeline {
                 echo 'Deploying the application...'
                 
                 // Tool: SCP (for secure file transfer)
-                // Ensure you replace the path to your key file
                 sh '''
                     scp -i /path/to/your/key.pem webapp.zip ec2-user@3.24.214.141:/var/www/html/
                 '''
@@ -73,7 +70,6 @@ pipeline {
                 echo 'Monitoring and Alerting...'
                 
                 // Tool: Datadog (for monitoring)
-                // Example integration with Datadog (ensure Datadog agent is set up)
                 sh '''
                     curl -X POST "https://api.datadoghq.com/api/v1/check_run" \
                     -H "Content-Type: application/json" \
