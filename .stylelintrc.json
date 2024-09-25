@@ -4,6 +4,10 @@
     "indentation": 2,
     "number-leading-zero": "always",
     "string-quotes": "single",
-    "color-no-invalid-hex": true
+    "font-family-no-missing-generic-family-keyword": true,
+    "rule-empty-line-before": ["always", {
+      "except": ["first-nested"],
+      "ignore": ["after-comment"]
+    }]
   }
 }
