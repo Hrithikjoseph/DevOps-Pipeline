@@ -1,10 +1,10 @@
 pipeline {
-    agent any
-
-    /*environment {
-        // Define environment variables here
-        // e.g., AWS credentials, SonarQube tokens, etc.
-    }*/
+    agent {
+        docker {
+            image 'maven:3.8.4-jdk-11' // Use an official Maven image with JDK
+            args '-v /var/run/docker.sock:/var/run/docker.sock' // If needed for Docker inside Docker
+        }
+    }
 
     stages {
 
