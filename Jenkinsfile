@@ -1,10 +1,10 @@
 pipeline {
     agent any
 
-    environment {
+    /*environment {
         // Define environment variables here
         // e.g., AWS credentials, SonarQube tokens, etc.
-    }
+    }*/
 
     stages {
 
