@@ -2,17 +2,16 @@ pipeline {
     agent any // Use any available agent (node)
 
     stages {
-        // Stage 1: Build
+        // Stage 1: Build (Packaging static files)
         stage('Build') {
             steps {
-                echo 'Building the application...'
+                echo 'Packaging static files...'
+
+                // Create a ZIP archive of the web app (HTML, CSS, SVG)
+                sh 'zip -r webapp.zip index.html main.css logo.svg'
                 
-                // For Java project example, create a JAR file
-                // Adjust this depending on your project type (web app, mobile app, etc.)
-                sh 'mvn clean package'
-                
-                // Store the build artifact
-                archiveArtifacts artifacts: '*/target/*.jar', allowEmptyArchive: true
+                // Archive the package as a build artifact
+                archiveArtifacts artifacts: 'webapp.zip', allowEmptyArchive: false
             }
         }
 
