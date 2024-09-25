@@ -1,28 +1,41 @@
+/* Main CSS file for styling the document */
 
-
+/* Heading styles */
 h1 {
-  font-size: 40px;
-  font-family: Arial
+    font-size: 40px;
+    font-family: Arial, sans-serif; /* Added generic family */
 }
+
 h2 {
-  font-size: 25px;
-  font-family: Arial
+    font-size: 25px;
+    font-family: Arial, sans-serif; /* Added generic family */
 }
+
 h3 {
-  font-family: Arial
+    font-family: Arial, sans-serif; /* Added generic family */
 }
+
+/* Paragraph styles */
 p {
-  font-size: 14px;
-  font-family: Arial
+    font-size: 14px;
+    font-family: Arial, sans-serif; /* Added generic family */
 }
-div{
-  background-color: darkcyan;
-  text-align:right;
+
+/* Division styles */
+div {
+    background-color: darkcyan;
+    text-align: right;
 }
+
+/* Table styles */
 th, td {
-  padding: 8px;
-  text-align: left;
-  border-bottom: 1px solid #ddd;
-  font-family: Arial
- }
- tr:nth-child(odd) {background-color: #f2f2f2;}
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    font-family: Arial, sans-serif; /* Added generic family */
+}
+
+/* Zebra striping for table rows */
+tr:nth-child(odd) {
+    background-color: #f2f2f2;
+}
